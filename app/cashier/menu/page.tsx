@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation'; // <-- Import hook resmi dari Next.js
 import { AlertInfo } from "@/components/alert";
 import Search from "./searchMenu";
 import MenuList from './card';
@@ -18,8 +19,11 @@ import {
 import { FaClockRotateLeft } from 'react-icons/fa6';
 import { GetCookie } from "@/lib/client-cookie";
 
-const MenuPage: React.FC<{ searchParams: { [key: string]: string | string[] | undefined } }> = ({ searchParams }) => {
-  const search = searchParams.search ? searchParams.search.toString() : "";   
+const MenuPage: React.FC = () => {
+  // Ambil searchParams menggunakan hook Client Component Next.js
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") || "";   
+
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userName, setUserName] = useState<string>("Kasir");
@@ -233,4 +237,4 @@ const MenuPage: React.FC<{ searchParams: { [key: string]: string | string[] | un
   );
 };
 
-export default MenuPage;
+export default MenuPage;git add .
