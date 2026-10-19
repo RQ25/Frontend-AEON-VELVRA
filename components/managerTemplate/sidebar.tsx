@@ -2,8 +2,6 @@
 import { ReactNode, useState, useEffect } from "react";
 import Image from "next/image";
 import MenuItem from "./menuItem";
-import Logo from '../../public/image/LEGO_logo.svg.png';
-import Profile from '../../public/image/profile.jpg';
 import { removeCookie, GetCookie } from "@/lib/client-cookie";
 import { useRouter } from "next/navigation";
 import { IUser } from "@/app/types";
@@ -101,7 +99,13 @@ const Sidebar = ({ children, id, title, menuList, user }: CashierProp) => {
         {/* logo section */}
         <div className="mb-3 w-full flex justify-center ">
           <div className="flex items-center space-x-2">
-            <Image src={Logo} alt="Logo" width={40} height={40} className="rounded-full" />
+            <Image 
+  src="/image/LEGO_logo.svg.png" 
+  alt="Logo" 
+  width={40} 
+  height={40} 
+  className="rounded-full" 
+/>
             <h1 className="text-2xl font-bold text-gray-800">Restaurant lama saji</h1>
           </div>
         </div>
