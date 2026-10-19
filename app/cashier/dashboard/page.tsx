@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { 
   FaClipboardList, 
   FaStar, 
@@ -18,12 +18,14 @@ import { BASE_API_URL } from "@/global";
 import { GetCookie, removeCookie } from "@/lib/client-cookie";
 import { get } from "@/lib/api-bridge";
 
+export const dynamic = "force-dynamic";
+
 const getMenuCount = async () => {
   try {
     const TOKEN = GetCookie("token") ?? "";
     const url = `${BASE_API_URL}/menu`;
     const { data } = await get(url, TOKEN);
-    if (data?.status) {
+    if (data?.status && Array.isArray(data.data)) {
       return data.data.length;
     }
     return 0;
@@ -38,7 +40,7 @@ const getFavoriteMenuCount = async () => {
     const TOKEN = GetCookie("token") ?? "";
     const url = `${BASE_API_URL}/menu?favorite=true`;
     const { data } = await get(url, TOKEN);
-    if (data?.status) {
+    if (data?.status && Array.isArray(data.data)) {
       return data.data.length;
     }
     return 0;
@@ -48,7 +50,7 @@ const getFavoriteMenuCount = async () => {
   }
 };
 
-const Dashboard = () => {
+const DashboardContent = () => {
   const router = useRouter();
   const [menuCount, setMenuCount] = useState(0);
   const [favCount, setFavCount] = useState(0);
@@ -336,4 +338,10 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black text-white p-8">Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
+  );
+}
