@@ -1,25 +1,36 @@
-"use client";
-import { ReactNode } from "react";
-import Sidebar from "./sidebar";
-type MenuType = {
-  id: string;
-  icon: ReactNode;
-  path: string;
-  label: string;
-};
-type ManagerProp = {
-  children: ReactNode;
-  id: string;
-  title: string;
-  menuList: MenuType[];
-};
-const ManagerTemplate = ({ children, id, title, menuList }: ManagerProp) => {
+import { ReactNode } from "react"
+import Sidebar from "./sidebar"
+
+export type MenuType = {
+  id: string
+  title?: string
+  label: string
+  path: string
+  icon?: ReactNode
+}
+
+type ManagerTemplateProps = {
+  children: ReactNode
+  menuList: any[]
+  title: string
+  id: string
+  user?: any
+}
+
+const ManagerTemplate = ({
+  children,
+  menuList,
+  title,
+  id,
+  user = { name: "Manager", role: "MANAGER" },
+}: ManagerTemplateProps) => {
   return (
     <div className="w-full min-h-dvh bg-slate-50">
-      <Sidebar menuList={menuList} title={title} id={id}>
+      <Sidebar menuList={menuList} title={title} id={id} user={user}>
         {children}
       </Sidebar>
     </div>
-  );
-};
-export default ManagerTemplate;
+  )
+}
+
+export default ManagerTemplate
