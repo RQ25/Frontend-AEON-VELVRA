@@ -18,8 +18,6 @@ import { BASE_API_URL } from "@/global";
 import { GetCookie, removeCookie } from "@/lib/client-cookie";
 import { get } from "@/lib/api-bridge";
 
-export const dynamic = "force-dynamic";
-
 const getMenuCount = async () => {
   try {
     const TOKEN = GetCookie("token") ?? "";

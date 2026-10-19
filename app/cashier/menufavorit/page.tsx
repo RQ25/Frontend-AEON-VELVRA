@@ -20,8 +20,6 @@ import { GetCookie, removeCookie } from "@/lib/client-cookie";
 import { get } from "@/lib/api-bridge";
 import { IMenu } from "@/app/types";
 
-export const dynamic = "force-dynamic";
-
 const getFavoriteMenu = async (search: string = ""): Promise<IMenu[]> => {
   try {
     const TOKEN = GetCookie("token") ?? "";
