@@ -4,49 +4,58 @@ import { BASE_API_URL, BASE_IMAGE_MENU } from "@/global"
 import { get } from "@/lib/api-bridge"
 import { AlertInfo } from "@/components/alert"
 import Image from "next/image"
-import Search from "./search";
-import AddMenu from "./addMenu";
+import Search from "./search"
+import AddMenu from "./addMenu"
 import EditMenu from "./editMenu"
 import DeleteMenu from "./deleteMenu"
-
-
 
 const getMenu = async (search: string): Promise<IMenu[]> => {
     try {
         const TOKEN = await getCookies("token")
-        const url = `${BASE_API_URL}/menu?search=${search}`
+        const url = `${BASE_API_URL}/menu?search=${encodeURIComponent(search)}`
         const data = await get(url, TOKEN)
         let result: IMenu[] = []
-        console.log(data)
-        if (data?.status) result = [...data.data.data]
+        if (data?.status && Array.isArray(data.data?.data)) {
+            result = [...data.data.data]
+        }
         return result
     } catch (error) {
-        console.log(error)
+        console.error("Error fetching menu:", error)
         return []
     }
 }
 
-
-const MenuPage = async ({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) => {
-    const search = searchParams?.search ? String(searchParams.search) : "";
-
-    const menu: IMenu[] = await getMenu(search);
-
-    const category = (cat: string): React.ReactNode => {
-        if (cat === "FOOD") {
-            return <span className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+const CategoryBadge = ({ category }: { category: string }) => {
+    if (category === "FOOD") {
+        return (
+            <span className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
                 Food
-            </span>;
-        }
-        if (cat === "DESSERT") {
-            return <span className="bg-amber-100 text-amber-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-amber-900 dark:text-amber-300">
+            </span>
+        )
+    }
+    if (category === "DESSERT") {
+        return (
+            <span className="bg-amber-100 text-amber-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-amber-900 dark:text-amber-300">
                 Dessert
-            </span>;
-        }
-        return <span className="bg-purple-100 text-purple-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">
+            </span>
+        )
+    }
+    return (
+        <span className="bg-purple-100 text-purple-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">
             Drink
-        </span>;
-    };
+        </span>
+    )
+}
+
+type PageProps = {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+const MenuPage = async ({ searchParams }: PageProps) => {
+    const resolvedSearchParams = await searchParams
+    const search = resolvedSearchParams?.search ? String(resolvedSearchParams.search) : ""
+
+    const menu: IMenu[] = await getMenu(search)
 
     return (
         <div>
@@ -74,34 +83,40 @@ const MenuPage = async ({ searchParams }: { searchParams: { [key: string]: strin
                     ) : (
                         <div className="m-2">
                             {menu.map((data, index) => (
-                                <div key={`keyPrestasi${index}`} className="flex flex-wrap shadow m-2">
+                                <div key={`menu-${index}`} className="flex flex-wrap shadow m-2 items-center">
                                     <div className="w-full md:w-1/12 p-2">
-                                        <small className="text-sm font-bold text-primary">Picture</small><br />
-                                        <Image width={40} height={40} src={`${BASE_IMAGE_MENU}/${data.picture}`} className="rounded-sm overflow-hidden" alt="preview" unoptimized />
+                                        <small className="text-sm font-bold text-primary block">Picture</small>
+                                        <Image 
+                                            width={40} 
+                                            height={40} 
+                                            src={`${BASE_IMAGE_MENU}/${data.picture}`} 
+                                            className="rounded-sm overflow-hidden object-cover" 
+                                            alt={data.name || "Menu Image"} 
+                                            unoptimized 
+                                        />
                                     </div>
                                     <div className="w-full md:w-2/12 p-2">
-                                        <small className="text-sm font-bold text-primary">Name</small> <br />
+                                        <small className="text-sm font-bold text-primary block">Name</small>
                                         {data.name}
                                     </div>
                                     <div className="w-full md:w-1/12 p-2">
-                                        <small className="text-sm font-bold text-primary">Price</small> <br />
-                                        {data.price}
+                                        <small className="text-sm font-bold text-primary block">Price</small>
+                                        {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(data.price)}
                                     </div>
                                     <div className="w-full md:w-5/12 p-2">
-                                        <small className="text-sm font-bold text-primary">Description</small> <br />
+                                        <small className="text-sm font-bold text-primary block">Description</small>
                                         {data.description}
                                     </div>
                                     <div className="w-full md:w-1/12 p-2">
-                                        <small className="text-sm font-bold text-primary">Category</small> <br />
-                                        {category(data.category)}
+                                        <small className="text-sm font-bold text-primary block">Category</small>
+                                        <CategoryBadge category={data.category} />
                                     </div>
                                     <div className="w-full md:w-2/12 p-2">
-                                        <small className="text-sm font-bold text-primary">Action</small><br />
+                                        <small className="text-sm font-bold text-primary block">Action</small>
                                         <div className="flex gap-1">
                                             <EditMenu selectedMenu={data} />
                                             <DeleteMenu selectedMenu={data} />
                                         </div>
-                                        
                                     </div>
                                 </div>
                             ))}
@@ -110,7 +125,7 @@ const MenuPage = async ({ searchParams }: { searchParams: { [key: string]: strin
                 }
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default MenuPage;
+export default MenuPage
