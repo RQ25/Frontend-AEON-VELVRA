@@ -237,4 +237,4 @@ const MenuPage: React.FC = () => {
   );
 };
 
-export default MenuPage;git add .
+export default MenuPage;
